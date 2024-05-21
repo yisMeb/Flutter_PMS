@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class login_page extends StatefulWidget {
   const login_page({super.key});
-  
+
   @override
   State<login_page> createState() => _LoginPageState();
 }
@@ -60,7 +60,8 @@ class _LoginPageState extends State<login_page> {
                       foregroundColor: Colors.white,
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       child: Text('LogIn'),
                     ),
                   ),
@@ -74,10 +75,9 @@ class _LoginPageState extends State<login_page> {
                 const Text("Don't have an account?"),
                 TextButton(
                   onPressed: () {
-                     //
+                    Navigator.pushNamed(context, '/signup');
                   },
                   child: const Text('Sign Up'),
-                  
                 ),
               ],
             ),
