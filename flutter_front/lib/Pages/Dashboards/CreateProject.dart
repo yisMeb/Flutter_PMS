@@ -10,11 +10,9 @@ class CreateProject extends StatefulWidget {
 
 class _CreateProject extends State<CreateProject> {
   final List<String> _teamMembers = [
-    "Alice",
-    "Bob",
-    "Charlie",
-    "David",
-    "Eve",
+    "Yisak",
+    "Wongel",
+    "Ekram",
   ];
 
   List<String> _selectedTeamMembers = [];
