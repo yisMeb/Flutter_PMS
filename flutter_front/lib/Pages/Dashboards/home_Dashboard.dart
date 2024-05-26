@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pmanager/Pages/Dashboards/CreateProject.dart';
-import 'package:pmanager/Pages/Dashboards/HomePage.dart'; // Import CreateProject class
+import 'package:pmanager/Pages/Dashboards/HomePage.dart';
+import 'package:pmanager/Pages/Dashboards/Projects.dart'; // Import CreateProject class
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({Key? key}) : super(key: key);
@@ -52,6 +53,20 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 child: Container(
                   color: Colors.black.withOpacity(0.5),
                   child: HomePage(),
+                ),
+              ),
+            ),
+          if (_selectedIndex == 1)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                },
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Projects(),
                 ),
               ),
             ),
