@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pmanager/Pages/forgot.dart';
 import 'package:pmanager/Pages/landing_page.dart';
 import 'package:pmanager/Pages/login_page.dart';
 import 'package:pmanager/Pages/signup.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
     routes: {
       '/login': (context) => const login_page(),
       '/signup': (context) => const Signup(),
+      '/forgot': (context) => const Forgot(),
     },
   ));
 }
