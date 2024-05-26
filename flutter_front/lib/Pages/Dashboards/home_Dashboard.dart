@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pmanager/Pages/Dashboards/CreateProject.dart';
-<<<<<<< Updated upstream
 import 'package:pmanager/Pages/Dashboards/HomePage.dart';
 import 'package:pmanager/Pages/Dashboards/Projects.dart'; // Import CreateProject class
-=======
-import 'package:pmanager/Pages/Dashboards/HomePage.dart'; // Import CreateProject class
 import 'package:pmanager/Pages/Dashboards/Settings.dart';
->>>>>>> Stashed changes
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({Key? key}) : super(key: key);
@@ -61,11 +57,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 ),
               ),
             ),
-<<<<<<< Updated upstream
-          if (_selectedIndex == 1)
-=======
           if (_selectedIndex == 4)
->>>>>>> Stashed changes
             Positioned.fill(
               child: GestureDetector(
                 onTap: () {
@@ -75,11 +67,8 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 },
                 child: Container(
                   color: Colors.black.withOpacity(0.5),
-<<<<<<< Updated upstream
-                  child: Projects(),
-=======
+                  // child: Projects(),
                   child: Settings(),
->>>>>>> Stashed changes
                 ),
               ),
             ),
