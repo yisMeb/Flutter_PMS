@@ -51,34 +51,135 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                homeNavBar(),
-                Row(
-                  children: [
-                    Text(
-                      _fullName,
-                      style: TextStyle(fontSize: 20),
-                    )
-                  ],
-                ),
-                Container(
-                  height: 250,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Visualizer(),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                homeTaskCard(),
-              ],
+              children: HomeWrap,
             ),
           ),
         ),
       ),
+    );
+  }
+
+  List<Widget> get HomeWrap {
+    return [
+      homeNavBar(),
+      Row(
+        children: [
+          Text(
+            _fullName,
+            style: TextStyle(fontSize: 20),
+          )
+        ],
+      ),
+      Container(
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Visualizer(),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      homeTaskCard(),
+      const SizedBox(
+        height: 20,
+      ),
+      taskLists()
+    ];
+  }
+
+  Column taskLists() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: const Text(
+            "Todays Task",
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 20,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Container(
+          height: 70,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 10,
+              ),
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: CircularProgressIndicator(
+                  value: 0.3,
+                  strokeWidth: 5,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Color.fromARGB(255, 29, 78, 95),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        "UI Design",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 227, 237, 240),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text(
+                          "On Progress",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 29, 78, 95),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "8 November 2024 | 13 Subtask",
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 158, 158, 158),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

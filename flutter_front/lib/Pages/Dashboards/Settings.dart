@@ -14,10 +14,11 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 229, 229, 229),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        toolbarHeight: 0, // Hide the default AppBar
+        toolbarHeight: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -26,8 +27,7 @@ class _SettingsState extends State<Settings> {
             const Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage(
-                    'images/avatar.png'), // Add your image asset here
+                backgroundImage: AssetImage('images/avatar.png'),
               ),
             ),
             SizedBox(height: 20),
@@ -51,6 +51,7 @@ class _SettingsState extends State<Settings> {
                 },
               ),
             ),
+            SizedBox(height: 10),
             SettingsTile(
               icon: Icons.lock,
               title: 'Password',
@@ -63,6 +64,7 @@ class _SettingsState extends State<Settings> {
                 );
               },
             ),
+            SizedBox(height: 10),
             SettingsTile(
               icon: Icons.logout,
               title: 'Logout',
@@ -71,13 +73,12 @@ class _SettingsState extends State<Settings> {
                 // Handle logout logic
               },
             ),
+            SizedBox(height: 10),
             SettingsTile(
               icon: Icons.group,
               title: 'Teams',
               trailing: Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                // Handle teams navigation logic
-              },
+              onTap: () {},
             ),
           ],
         ),
