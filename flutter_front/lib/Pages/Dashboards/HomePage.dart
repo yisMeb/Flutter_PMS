@@ -95,9 +95,9 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Align(
+        const Align(
           alignment: Alignment.centerLeft,
-          child: const Text(
+          child: Text(
             "Todays Task",
             style: TextStyle(
               fontWeight: FontWeight.w400,
@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "8 November 2024 | 13 Subtask",
                     style: TextStyle(
                       color: Color.fromARGB(190, 158, 158, 158),

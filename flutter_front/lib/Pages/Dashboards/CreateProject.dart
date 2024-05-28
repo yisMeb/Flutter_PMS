@@ -8,21 +8,35 @@ class CreateProject extends StatefulWidget {
   const CreateProject({super.key});
 
   @override
-  State<CreateProject> createState() => _CreateProject();
+  State<CreateProject> createState() => _CreateProjectState();
 }
 
-class _CreateProject extends State<CreateProject> {
-  final List<String> _teamMembers = [
-    "Yisak",
-    "Wongel",
-    "Ekram",
-  ];
-
+class _CreateProjectState extends State<CreateProject> {
+  List<String> _teamMembers = [];
   List<String> _selectedTeamMembers = [];
   DateTime? _startDate;
   DateTime? _endDate;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTeamMembers();
+  }
+
+  Future<void> _fetchTeamMembers() async {
+    try {
+      List<String> teamMembers = await DatabaseServices().fetchTeamMembers();
+      setState(() {
+        _teamMembers = teamMembers;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch team members: $error')),
+      );
+    }
+  }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -94,8 +108,6 @@ class _CreateProject extends State<CreateProject> {
         return;
       }
     }
-
-    // Proceed to create the project
     await DatabaseServices().createProject(
       title: _titleController.text,
       details: _detailsController.text,
@@ -118,7 +130,7 @@ class _CreateProject extends State<CreateProject> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +142,7 @@ class _CreateProject extends State<CreateProject> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _titleController,
                   decoration: const InputDecoration(
@@ -140,7 +152,7 @@ class _CreateProject extends State<CreateProject> {
                     fillColor: Colors.white,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 const Text(
                   "Project Details",
                   style: TextStyle(
@@ -148,7 +160,7 @@ class _CreateProject extends State<CreateProject> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _detailsController,
                   decoration: const InputDecoration(
@@ -159,7 +171,7 @@ class _CreateProject extends State<CreateProject> {
                   ),
                   maxLines: 2,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 const Text(
                   "Add team members",
                   style: TextStyle(
@@ -167,16 +179,16 @@ class _CreateProject extends State<CreateProject> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 MultiSelectDialogField(
                   items: _teamMembers
                       .map((member) => MultiSelectItem<String>(member, member))
                       .toList(),
-                  title: Text("Team Members"),
+                  title: const Text("Team Members"),
                   selectedColor: Colors.blue,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     border: Border.all(
                       color: Colors.grey,
                       width: 1,
@@ -199,7 +211,7 @@ class _CreateProject extends State<CreateProject> {
                     });
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 const Text(
                   "Start & End date",
                   style: TextStyle(
@@ -207,15 +219,15 @@ class _CreateProject extends State<CreateProject> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Start Date"),
-                          SizedBox(height: 10),
+                          const Text("Start Date"),
+                          const SizedBox(height: 10),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -226,8 +238,8 @@ class _CreateProject extends State<CreateProject> {
                               onTap: () => _selectDate(context, true),
                               child: Row(
                                 children: [
-                                  Icon(Icons.calendar_today),
-                                  SizedBox(width: 10),
+                                  const Icon(Icons.calendar_today),
+                                  const SizedBox(width: 10),
                                   Text(
                                     _startDate == null
                                         ? 'Select start date'
@@ -240,15 +252,15 @@ class _CreateProject extends State<CreateProject> {
                         ],
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("End Date"),
-                          SizedBox(height: 10),
+                          const Text("End Date"),
+                          const SizedBox(height: 10),
                           Container(
-                            padding: EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(8),
@@ -257,8 +269,8 @@ class _CreateProject extends State<CreateProject> {
                               onTap: () => _selectDate(context, false),
                               child: Row(
                                 children: [
-                                  Icon(Icons.calendar_today),
-                                  SizedBox(width: 10),
+                                  const Icon(Icons.calendar_today),
+                                  const SizedBox(width: 10),
                                   Text(
                                     _endDate == null
                                         ? 'Select end date'
@@ -277,15 +289,16 @@ class _CreateProject extends State<CreateProject> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _createProject,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 54, 52, 163),
+                          backgroundColor:
+                              const Color.fromARGB(255, 54, 52, 163),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          fixedSize: Size.fromWidth(207),
+                          fixedSize: const Size.fromWidth(207),
                         ),
                         child: const Text(
                           "Create",
@@ -302,7 +315,7 @@ class _CreateProject extends State<CreateProject> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          fixedSize: Size.fromWidth(207),
+                          fixedSize: const Size.fromWidth(207),
                         ),
                         child: const Text(
                           "Cancel",

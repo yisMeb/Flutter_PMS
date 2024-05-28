@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:developer' as developer;
 
+import 'package:pmanager/Pages/Dashboards/Teams.dart';
+
 class Settings extends StatefulWidget {
   const Settings({super.key});
 
@@ -46,7 +48,7 @@ class _SettingsState extends State<Settings> {
                 value: notification,
                 onChanged: (newValue) {
                   setState(() {
-                    notification = newValue; // Update state on change
+                    notification = newValue;
                   });
                 },
               ),
@@ -78,7 +80,12 @@ class _SettingsState extends State<Settings> {
               icon: Icons.group,
               title: 'Teams',
               trailing: Icon(Icons.arrow_forward_ios),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Teams()),
+                );
+              },
             ),
           ],
         ),
