@@ -17,9 +17,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     return Container(
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 36, 52, 57),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
       ),
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(20),
       child: TableCalendar(
         firstDay: DateTime.utc(2020, 1, 1),
         lastDay: DateTime.utc(2030, 12, 31),

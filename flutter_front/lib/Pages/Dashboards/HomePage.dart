@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pmanager/Pages/Dashboards/DatabaseService.dart';
 import 'package:pmanager/Pages/Dashboards/Visualizer.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,17 +13,60 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _fullName = '';
-  String taskNum = 10.toString();
+  late String _fullName;
+  late String taskNum;
+  late List<Map<String, dynamic>> _tasks = [];
 
   @override
   void initState() {
     super.initState();
+    _fullName = '';
+    taskNum = 10.toString();
     _fetchFullName();
+    _fetchTasks();
   }
 
-  String formattedDate(DateTime dateTime) {
-    return DateFormat('d MMMM yyyy').format(dateTime);
+  double _calculateProgress(DateTime startDate, DateTime endDate) {
+    final totalDuration = endDate.difference(startDate).inDays;
+    final elapsedDuration = DateTime.now().difference(startDate).inDays;
+    return (elapsedDuration / totalDuration).clamp(0.0, 1.0);
+  }
+
+  Color _getColorBasedOnProgress(double progress) {
+    if (progress >= 0.9) {
+      return Colors.red;
+    } else if (progress == 0.0) {
+      return Color.fromARGB(255, 170, 153, 4);
+    } else {
+      return Colors.blue;
+    }
+  }
+
+  String _getStatusText(double progress) {
+    if (progress >= 1.0) {
+      return 'Completed';
+    } else if (progress <= 0.0) {
+      return 'Queued';
+    } else {
+      return 'On Progress';
+    }
+  }
+
+  Future<void> _fetchTasks() async {
+    try {
+      final List<Map<String, dynamic>> tasks =
+          await DatabaseServices().fetchSubtasks();
+      tasks.sort((a, b) {
+        final DateTime deadlineA = DateTime.parse(a['endDate']);
+        final DateTime deadlineB = DateTime.parse(b['endDate']);
+        return deadlineA.compareTo(deadlineB);
+      });
+      setState(() {
+        _tasks = tasks;
+      });
+    } catch (error) {
+      print('Error fetching tasks: $error');
+    }
   }
 
   Future<void> _fetchFullName() async {
@@ -40,6 +84,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  String formattedDate(DateTime dateTime) {
+    return DateFormat('d MMMM yyyy').format(dateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +99,25 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: HomeWrap,
+              children: [
+                _buildHomeNavBar(),
+                const SizedBox(height: 20),
+                _buildFullNameText(),
+                const SizedBox(height: 20),
+                _buildVisualizer(),
+                const SizedBox(height: 20),
+                _buildHomeTaskCard(),
+                const SizedBox(height: 20),
+                const Text(
+                  "Your Tasks",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildTaskLists(),
+              ],
             ),
           ),
         ),
@@ -59,136 +125,38 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<Widget> get HomeWrap {
-    return [
-      homeNavBar(),
-      Row(
-        children: [
-          Text(
-            _fullName,
-            style: TextStyle(fontSize: 20),
-          )
-        ],
-      ),
-      Container(
-        height: 250,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Visualizer(),
-      ),
-      const SizedBox(
-        height: 20,
-      ),
-      homeTaskCard(),
-      const SizedBox(
-        height: 20,
-      ),
-      taskLists()
-    ];
-  }
-
-  Column taskLists() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+  Widget _buildFullNameText() {
+    return Row(
       children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "Todays Task",
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 20,
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Container(
-          height: 70,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white,
-          ),
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 10,
-              ),
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: CircularProgressIndicator(
-                  value: 0.3,
-                  strokeWidth: 5,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color.fromARGB(255, 29, 78, 95),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      const Text(
-                        "UI Design",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 227, 237, 240),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Text(
-                          "On Progress",
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 29, 78, 95),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text(
-                    "8 November 2024 | 13 Subtask",
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 158, 158, 158),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        Text(
+          _fullName,
+          style: TextStyle(fontSize: 20),
+        )
       ],
     );
   }
 
-  Container homeTaskCard() {
+  Widget _buildVisualizer() {
+    return Container(
+      height: 250,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Visualizer(),
+      ),
+    );
+  }
+
+  Widget _buildHomeTaskCard() {
     return Container(
       height: 150,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Color.fromARGB(235, 54, 52, 163),
+        color: const Color.fromARGB(235, 54, 52, 163),
         borderRadius: BorderRadius.circular(10),
         image: const DecorationImage(
           image: AssetImage('images/cardbg.png'),
@@ -257,7 +225,106 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row homeNavBar() {
+  Widget _buildTaskLists() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseServices().fetchSubtasks(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text('No tasks found');
+        }
+
+        final tasks = snapshot.data!;
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: tasks.map((task) {
+            final double progress = _calculateProgress(
+              DateTime.parse(task['startDate']),
+              DateTime.parse(task['endDate']),
+            );
+            final int teamMemberCount = task['selectedTeamMembers'] != null
+                ? task['selectedTeamMembers'].length
+                : 0;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Container(
+                height: 80,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 5,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _getColorBasedOnProgress(progress),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              task['taskName'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 227, 237, 240),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                _getStatusText(progress),
+                                style: TextStyle(
+                                  color: _getColorBasedOnProgress(progress),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "${formattedDate(DateTime.parse(task['startDate']))} | $teamMemberCount Teams",
+                          style: const TextStyle(
+                            color: Color.fromARGB(190, 158, 158, 158),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildHomeNavBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -267,8 +334,8 @@ class _HomePageState extends State<HomePage> {
         ),
         Row(
           children: [
-            const Icon(Icons.notifications_none_outlined),
-            const SizedBox(width: 10),
+            Icon(Icons.notifications_none_outlined),
+            SizedBox(width: 10),
             CircleAvatar(
               radius: 25,
               backgroundColor: Color.fromRGBO(153, 215, 245, 1),
