@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pmanager/Pages/Dashboards/AllProj.dart';
 import 'package:pmanager/Pages/Dashboards/CreateProject.dart';
 import 'package:pmanager/Pages/Dashboards/HomePage.dart';
 import 'package:pmanager/Pages/Dashboards/Projects.dart'; // Import CreateProject class
@@ -39,7 +40,21 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 },
                 child: Container(
                   color: Colors.black.withOpacity(0.5),
-                  child: CreateProject(),
+                  child: const CreateProject(),
+                ),
+              ),
+            ),
+          if (_selectedIndex == 1)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                },
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const AllProj(),
                 ),
               ),
             ),

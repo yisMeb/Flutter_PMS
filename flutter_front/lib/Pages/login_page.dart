@@ -169,19 +169,19 @@ class _LoginPageState extends State<login_page> {
   }
 
   _login() async {
-    final user = await _auth.loginUserwithEmailandPassword(
-        email.toString(), password.toString());
-    if (user != null) {
+    try {
+      final user = await _auth.loginUserwithEmailandPassword(
+          email.toString(), password.toString());
       developer.log("Login Success");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeDashboard()),
       );
-    } else {
+    } catch (e) {
+      developer.log("Login Failed: $e");
       setState(() {
-        errorMessage = "Login Failed. Please check your credentials.";
+        errorMessage = "Login Failed: $e";
       });
-      developer.log("Login Failed");
     }
   }
 
