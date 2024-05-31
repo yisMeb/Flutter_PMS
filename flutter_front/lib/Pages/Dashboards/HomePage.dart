@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     if (progress >= 0.9) {
       return Colors.red;
     } else if (progress == 0.0) {
-      return const Color.fromARGB(255, 170, 153, 4);
+      return Color.fromARGB(255, 170, 153, 4);
     } else {
       return Colors.blue;
     }
@@ -78,10 +78,9 @@ class _HomePageState extends State<HomePage> {
       final snapshot = await ref.get();
       if (snapshot.exists) {
         Map<dynamic, dynamic> data = snapshot.value as dynamic;
-        //setState(() => _fullName = data['fullName'] ?? '');
-        if (mounted) {
-          setState(() => _fullName = data['fullName'] ?? '');
-        }
+        setState(() {
+          _fullName = data['fullName'] ?? '';
+        });
       }
     }
   }

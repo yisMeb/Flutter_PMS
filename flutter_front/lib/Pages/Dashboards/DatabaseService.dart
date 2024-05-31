@@ -141,7 +141,7 @@ class DatabaseServices {
       'userEmail': userEmail,
       'userEmail_taskName': userEmailTaskName,
       'selectedTeamMembers': selectedTeamMembers,
-      'projectName': projectName, // Add project name
+      'projectName': projectName,
       'isDone': false,
     });
   }
@@ -240,8 +240,17 @@ class DatabaseServices {
 
   Future<List<Map<String, dynamic>>> fetchSubtasks() async {
     try {
-      final DataSnapshot snapshot =
-          await _subtasksRef.once().then((event) => event.snapshot);
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not logged in');
+      }
+
+      final DataSnapshot snapshot = await _subtasksRef
+          .orderByChild('userEmail')
+          .equalTo(user.email)
+          .once()
+          .then((event) => event.snapshot);
+
       if (snapshot.value != null) {
         final List<Map<String, dynamic>> subtasks = [];
         Map<dynamic, dynamic> data = snapshot.value as dynamic;
