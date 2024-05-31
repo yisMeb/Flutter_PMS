@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fullName = '';
-    taskNum = 10.toString();
+    taskNum = '0';
     _fetchFullName();
     _fetchTasks();
   }
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     if (progress >= 0.9) {
       return Colors.red;
     } else if (progress == 0.0) {
-      return Color.fromARGB(255, 170, 153, 4);
+      return const Color.fromARGB(255, 170, 153, 4);
     } else {
       return Colors.blue;
     }
@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
       });
       setState(() {
         _tasks = tasks;
+        taskNum = tasks.length.toString();
       });
     } catch (error) {
       print('Error fetching tasks: $error');
@@ -203,21 +204,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 38, 50, 56),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
-                  ),
-                  child: const Text(
-                    "See today's task",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              const Padding(
+                padding: EdgeInsets.all(16.0),
               ),
             ],
           ),
@@ -227,101 +215,87 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTaskLists() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: DatabaseServices().fetchSubtasks(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('No tasks found');
-        }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: _tasks.map((task) {
+        final double progress = _calculateProgress(
+          DateTime.parse(task['startDate']),
+          DateTime.parse(task['endDate']),
+        );
+        final int teamMemberCount = task['selectedTeamMembers'] != null
+            ? task['selectedTeamMembers'].length
+            : 0;
 
-        final tasks = snapshot.data!;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: tasks.map((task) {
-            final double progress = _calculateProgress(
-              DateTime.parse(task['startDate']),
-              DateTime.parse(task['endDate']),
-            );
-            final int teamMemberCount = task['selectedTeamMembers'] != null
-                ? task['selectedTeamMembers'].length
-                : 0;
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Container(
-                height: 80,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: CircularProgressIndicator(
-                        value: progress,
-                        strokeWidth: 5,
-                        backgroundColor: Colors.grey[300],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _getColorBasedOnProgress(progress),
-                        ),
-                      ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Container(
+            height: 80,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 5,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getColorBasedOnProgress(progress),
                     ),
-                    SizedBox(width: 20),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              task['taskName'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 227, 237, 240),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                _getStatusText(progress),
-                                style: TextStyle(
-                                  color: _getColorBasedOnProgress(progress),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
                         Text(
-                          "${formattedDate(DateTime.parse(task['startDate']))} | $teamMemberCount Teams",
+                          task['taskName'],
                           style: const TextStyle(
-                            color: Color.fromARGB(190, 158, 158, 158),
-                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 227, 237, 240),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            _getStatusText(progress),
+                            style: TextStyle(
+                              color: _getColorBasedOnProgress(progress),
+                            ),
                           ),
                         ),
                       ],
                     ),
+                    SizedBox(height: 10),
+                    Text(
+                      "${formattedDate(DateTime.parse(task['startDate']))} | $teamMemberCount Teams",
+                      style: const TextStyle(
+                        color: Color.fromARGB(190, 158, 158, 158),
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            );
-          }).toList(),
+              ],
+            ),
+          ),
         );
-      },
+      }).toList(),
     );
   }
 
