@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as developer;
 
 import 'package:pmanager/Pages/Dashboards/Teams.dart';
+import 'package:pmanager/Pages/landing_page.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -73,6 +75,11 @@ class _SettingsState extends State<Settings> {
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
                 // Handle logout logic
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) =>
+                      logoutConfirmationBottomSheet(context),
+                );
               },
             ),
             SizedBox(height: 10),
@@ -252,9 +259,11 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Add logic to update password (placeholder for now)
-                    print('Passwords updated successfully!');
-                    // You can potentially access passed user info using widget.currentUser if provided
+                    changePassword(
+                        currentPassword: _oldPasswordController.text,
+                        newPassword: _newPasswordController.text,
+                        context: context);
+                    developer.log('Passwords updated successfully!');
                   }
                 },
                 child: Text('Update Password'),
@@ -265,4 +274,113 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
       ),
     );
   }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required BuildContext context,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("No user is currently signed in."),
+      ));
+      return;
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+
+    try {
+      // Re-authenticate the user
+      await user.reauthenticateWithCredential(credential);
+      // Update the password
+      await user.updatePassword(newPassword);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Password changed successfully."),
+      ));
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(e.message ?? "An error occurred."),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("An error occurred."),
+      ));
+    }
+  }
+}
+
+Widget logoutConfirmationBottomSheet(context) {
+  return Container(
+    height: 300, // Adjust height as needed
+    width: 400,
+    padding: const EdgeInsets.all(20.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(30.0), // Add rounded corners
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+      children: [
+        const Text('Are you sure you want to log out?'),
+        const SizedBox(height: 30.0), // Add spacing between text and buttons
+        Column(
+          // Replace the Row with a nested Column
+          mainAxisSize: MainAxisSize.min, // Wrap content vertically
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                developer.log("Logout succesful");
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => landing_page()),
+                      (Route<dynamic> route) => false);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Error logging out. Please try again.')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Color.fromARGB(255, 54, 52, 163),
+                foregroundColor: Colors.white,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                child: Text('Log Out'),
+              ),
+            ),
+            const SizedBox(height: 10.0), // Add spacing between buttons
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Color.fromARGB(255, 194, 49, 49),
+                foregroundColor: Colors.white,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                child: Text('Cancel'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }

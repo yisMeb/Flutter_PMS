@@ -77,9 +77,10 @@ class _HomePageState extends State<HomePage> {
       final snapshot = await ref.get();
       if (snapshot.exists) {
         Map<dynamic, dynamic> data = snapshot.value as dynamic;
-        setState(() {
-          _fullName = data['fullName'] ?? '';
-        });
+        //setState(() => _fullName = data['fullName'] ?? '');
+        if (mounted) {
+          setState(() => _fullName = data['fullName'] ?? '');
+        }
       }
     }
   }
