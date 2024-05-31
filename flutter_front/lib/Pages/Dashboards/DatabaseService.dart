@@ -10,6 +10,8 @@ class DatabaseServices {
       FirebaseDatabase.instance.ref().child('Subtasks');
   final DatabaseReference _tasksRef =
       FirebaseDatabase.instance.ref().child('Subtasks');
+  final DatabaseReference _remindersRef =
+      FirebaseDatabase.instance.ref().child('Reminders');
 
   Future<List<String>> fetchTeamMembers() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -267,5 +269,22 @@ class DatabaseServices {
     } catch (error) {
       throw Exception('Failed to fetch subtasks: $error');
     }
+  }
+
+  Future<void> createReminder({
+    required String title,
+    required DateTime reminderTime,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+
+    final newReminderRef = _remindersRef.push();
+    await newReminderRef.set({
+      'title': title,
+      'reminderTime': reminderTime.toIso8601String(),
+      'userEmail': user.email,
+    });
   }
 }
